@@ -2,22 +2,18 @@ import * as d3 from "d3";
 
 import miserables from "../data/miserables.json";
 
+const nodeId = (d) => d.id;
+const labelWidth = (d) => d.id.length * 9;
+const labelX = (d) => (-1 * labelWidth(d)) / 2;
+
+const textHeight = 15; // Approx
+const labelYOffset = 10;
+const labelHeight = 20;
+
 function makeGraph(graph, options) {
   const { width, height } = options;
 
   const color = d3.scaleOrdinal(d3.schemeSet3);
-
-  color(0);
-  color(1);
-  color(2);
-  color(3);
-  color(4);
-  color(5);
-  color(6);
-  color(7);
-  color(8);
-  color(9);
-  color(10);
 
   const tooltip = d3
     .select("#app")
@@ -36,9 +32,7 @@ function makeGraph(graph, options) {
     .nodes(graph.nodes)
     .force(
       "link",
-      d3.forceLink().id((d) => {
-        return d.id;
-      })
+      d3.forceLink().id((d) => d.id)
     )
     .force("charge", d3.forceManyBody())
     .force("center", d3.forceCenter(width / 2, height / 2))
@@ -46,7 +40,7 @@ function makeGraph(graph, options) {
 
   simulation.force("link").links(graph.links);
 
-  const R = 6;
+  const circleRadius = 6;
 
   let link = svg.selectAll("line").data(graph.links).enter().append("line");
 
@@ -91,8 +85,24 @@ function makeGraph(graph, options) {
     );
 
   node
+    .append("rect")
+    .attr("x", labelX)
+    .attr("y", labelYOffset)
+    .attr("width", labelWidth)
+    .attr("height", labelHeight)
+    .attr("fill", "#eee")
+    .attr("fill-opacity", 0.8);
+
+  node
+    .append("text")
+    .attr("x", (d) => labelX(d) + 10)
+    .attr("y", labelYOffset + textHeight)
+    .attr("font-size", "0.8em")
+    .text(nodeId);
+
+  node
     .append("circle")
-    .attr("r", R)
+    .attr("r", circleRadius)
     .attr("fill", function (d) {
       return color(d.group);
     })
@@ -109,10 +119,10 @@ function makeGraph(graph, options) {
       tooltip.transition().duration(100).style("opacity", 0);
     })
     .on("mouseout.fade", fade(1))
-    // .on("mousemove", function (d, node) {
-    //   const { x, y } = node;
-    //   tooltip.style("left", x + "px").style("top", y + 10 + "px");
-    // })
+    .on("mousemove", function (event, node) {
+      const { x, y } = node;
+      tooltip.style("left", x + "px").style("top", y + 10 + "px");
+    })
     .on("dblclick", releasenode);
 
   node
@@ -132,7 +142,6 @@ function makeGraph(graph, options) {
   }
 
   function dragstarted(event, d) {
-    // if (!d3.event.active) simulation.alphaTarget(0.3).restart();
     if (!event.active) simulation.alphaTarget(0.3).restart();
     d.fx = d.x;
     d.fy = d.y;
@@ -146,7 +155,6 @@ function makeGraph(graph, options) {
 
   function dragended(event, d) {
     if (!event.active) simulation.alphaTarget(0);
-    // if (!d3.event.active) simulation.alphaTarget(0);
   }
 
   // TODO: Is this needed?
@@ -156,6 +164,7 @@ function makeGraph(graph, options) {
   }
 
   const linkedByIndex = {};
+
   graph.links.forEach((d) => {
     linkedByIndex[`${d.source.index},${d.target.index}`] = 1;
   });
