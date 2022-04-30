@@ -8,6 +8,22 @@ const templateContent = `
     <title>D3 Force Directed Graph</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
+      body, html {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      #app {
+        width: 90vw;
+        height: 90vh;
+        border: 1px solid #aaa;
+      }
+
       .link {
         stroke: #c1c1c1;
         stroke-width: 2px;

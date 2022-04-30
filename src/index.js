@@ -21,11 +21,9 @@ function makeGraph(graph, options) {
     .attr("class", "tooltip")
     .style("opacity", 0);
 
-  const svg = d3
-    .create("svg")
-    .attr("width", width)
-    .attr("height", height)
-    .attr("style", "border: 1px solid #888888;");
+  const svg = d3.create("svg").attr("width", width).attr("height", height);
+
+  const forceCharge = d3.forceManyBody().strength(-100);
 
   const simulation = d3
     .forceSimulation()
@@ -34,7 +32,7 @@ function makeGraph(graph, options) {
       "link",
       d3.forceLink().id((d) => d.id)
     )
-    .force("charge", d3.forceManyBody())
+    .force("charge", forceCharge)
     .force("center", d3.forceCenter(width / 2, height / 2))
     .on("tick", ticked);
 
@@ -64,7 +62,7 @@ function makeGraph(graph, options) {
     .on("mouseout.tooltip", function () {
       tooltip.transition().duration(100).style("opacity", 0);
     })
-    .on("mouseout.fade", fade(1))
+    // .on("mouseout.fade", fade(1));
     .on("mousemove", function (event) {
       const [x, y] = d3.pointer(event);
       tooltip.style("left", x + "px").style("top", y + 10 + "px");
@@ -106,24 +104,24 @@ function makeGraph(graph, options) {
     .attr("fill", function (d) {
       return color(d.group);
     })
-    .on("mouseover.tooltip", function (event, node) {
-      const { x, y } = node;
-      tooltip.transition().duration(300).style("opacity", 0.8);
-      tooltip
-        .html("Name:" + node.id + "<p/>group:" + node.group)
-        .style("left", x + "px")
-        .style("top", y + 10 + "px");
-    })
+    // .on("mouseover.tooltip", function (event, node) {
+    //   const { x, y } = node;
+    //   tooltip.transition().duration(300).style("opacity", 0.8);
+    //   tooltip
+    //     .html("Name:" + node.id + "<p/>group:" + node.group)
+    //     .style("left", x + "px")
+    //     .style("top", y + 10 + "px");
+    // })
     .on("mouseover.fade", fade(0.1))
-    .on("mouseout.tooltip", function () {
-      tooltip.transition().duration(100).style("opacity", 0);
-    })
-    .on("mouseout.fade", fade(1))
-    .on("mousemove", function (event, node) {
-      const { x, y } = node;
-      tooltip.style("left", x + "px").style("top", y + 10 + "px");
-    })
-    .on("dblclick", releasenode);
+    // .on("mouseout.tooltip", function () {
+    //   tooltip.transition().duration(100).style("opacity", 0);
+    // })
+    .on("mouseout.fade", fade(1));
+  // .on("mousemove", function (event, node) {
+  //   const { x, y } = node;
+  //   tooltip.style("left", x + "px").style("top", y + 10 + "px");
+  // })
+  // .on("dblclick", releasenode);
 
   node
     .append("text")
@@ -158,10 +156,10 @@ function makeGraph(graph, options) {
   }
 
   // TODO: Is this needed?
-  function releasenode(d) {
-    d.fx = null;
-    d.fy = null;
-  }
+  // function releasenode(d) {
+  //   d.fx = null;
+  //   d.fy = null;
+  // }
 
   const linkedByIndex = {};
 
@@ -217,9 +215,12 @@ function makeGraph(graph, options) {
   return svg.node();
 }
 
-const graph = makeGraph(miserables, {
-  width: 800,
-  height: 500,
+const appEl = document.getElementById("app");
+const { offsetWidth, offsetHeight } = appEl;
+
+const graphEl = makeGraph(miserables, {
+  width: offsetWidth,
+  height: offsetHeight,
 });
 
-document.getElementById("app").appendChild(graph);
+appEl.appendChild(graphEl);
