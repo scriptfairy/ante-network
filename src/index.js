@@ -1,6 +1,6 @@
 import * as d3 from "d3";
 
-import miserables from "../data/miserables.json";
+import network from "../data/network_query.json";
 
 const nodeId = (d) => d.id;
 const labelWidth = (d) => d.id.length * 9;
@@ -23,7 +23,8 @@ function makeGraph(graph, options) {
 
   const svg = d3.create("svg").attr("width", width).attr("height", height);
 
-  const forceCharge = d3.forceManyBody().strength(-100);
+  // const forceCharge = d3.forceManyBody().strength(-40);
+  const forceCharge = d3.forceManyBody().strength(-500);
 
   const simulation = d3
     .forceSimulation()
@@ -62,7 +63,7 @@ function makeGraph(graph, options) {
     .on("mouseout.tooltip", function () {
       tooltip.transition().duration(100).style("opacity", 0);
     })
-    // .on("mouseout.fade", fade(1));
+
     .on("mousemove", function (event) {
       const [x, y] = d3.pointer(event);
       tooltip.style("left", x + "px").style("top", y + 10 + "px");
@@ -104,24 +105,10 @@ function makeGraph(graph, options) {
     .attr("fill", function (d) {
       return color(d.group);
     })
-    // .on("mouseover.tooltip", function (event, node) {
-    //   const { x, y } = node;
-    //   tooltip.transition().duration(300).style("opacity", 0.8);
-    //   tooltip
-    //     .html("Name:" + node.id + "<p/>group:" + node.group)
-    //     .style("left", x + "px")
-    //     .style("top", y + 10 + "px");
-    // })
+
     .on("mouseover.fade", fade(0.1))
-    // .on("mouseout.tooltip", function () {
-    //   tooltip.transition().duration(100).style("opacity", 0);
-    // })
+
     .on("mouseout.fade", fade(1));
-  // .on("mousemove", function (event, node) {
-  //   const { x, y } = node;
-  //   tooltip.style("left", x + "px").style("top", y + 10 + "px");
-  // })
-  // .on("dblclick", releasenode);
 
   node
     .append("text")
@@ -155,12 +142,6 @@ function makeGraph(graph, options) {
     if (!event.active) simulation.alphaTarget(0);
   }
 
-  // TODO: Is this needed?
-  // function releasenode(d) {
-  //   d.fx = null;
-  //   d.fy = null;
-  // }
-
   const linkedByIndex = {};
 
   graph.links.forEach((d) => {
@@ -189,36 +170,13 @@ function makeGraph(graph, options) {
     };
   }
 
-  // var sequentialScale = d3
-  //   .scaleOrdinal(d3.schemeSet3)
-  //   .domain([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
-
-  // svg
-  //   .append("g")
-  //   .attr("class", "legendSequential")
-  //   .attr(
-  //     "transform",
-  //     "translate(" + (width - 140) + "," + (height - 300) + ")"
-  //   );
-
-  // var legendSequential = d3
-  //   .legendColor()
-  //   .shapeWidth(30)
-  //   .cells(11)
-  //   .orient("vertical")
-  //   .title("Group number by color:")
-  //   .titleWidth(100)
-  //   .scale(sequentialScale);
-
-  // svg.select(".legendSequential").call(legendSequential);
-
   return svg.node();
 }
 
 const appEl = document.getElementById("app");
 const { offsetWidth, offsetHeight } = appEl;
-
-const graphEl = makeGraph(miserables, {
+console.log(offsetWidth, offsetHeight);
+const graphEl = makeGraph(network, {
   width: offsetWidth,
   height: offsetHeight,
 });

@@ -9,19 +9,15 @@ const templateContent = `
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
       body, html {
-        width: 100%;
-        height: 100%;
+        width: 1000px;
+        height: 1000px;
         margin: 0;
         padding: 0;
-        display: flex;
-        align-items: center;
-        justify-content: center;
       }
       
       #app {
-        width: 90vw;
-        height: 90vh;
-        border: 1px solid #aaa;
+        width: 1000px;
+        height: 1000px;
       }
 
       .link {
